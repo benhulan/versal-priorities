@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Priority Matrix</title>
+<script src="bower_components/versal-component-runtime/dist/runtime.min.js"></script>
+<link rel="import" href="bower_components/versal-gadget-api/versal-gadget-api.html">
+</head>
+
+<body>
+<fieldset>
+    <div class="feature1">
+        <legend>Feature 1</legend>
+        <textarea id="story1" name="story1" placeholder="Describe your feature or user story."></textarea>
+        <br />
+        <!--
+            // NOTE:
+            // Option values will be multiplied and added together to create an x or y coordinate.
+            // More thought needs to go into the option values.
+        -->
+        <label for="importance">Importance to the User</label>
+        <select name="importance" id="importance" size="1">
+            <option value="-1">1</option>
+            <option value="0">2</option>
+            <option value="1">3</option>
+            <option value="2">4</option>
+            <option value="3">5</option>
+        </select>
+        <br />
+        <label for="revenue" size="1">Revenue Upside</label>
+        <select name="revenue"  id="revenue" size="1">
+            <option value="0">1</option>
+            <option value="1">2</option>
+            <option value="1.5">3</option>
+            <option value="2">4</option>
+            <option value="2.5">5</option>
+        </select>
+        <br />
+        <label for="advantage" size="1">Competitive Advantage</label>
+        <select name="advantage" id="advantage" size="1">
+            <option value="-2">1</option>
+            <option value="-1">2</option>
+            <option value="0">3</option>
+            <option value="1">4</option>
+            <option value="2">5</option>
+        </select>
+        <br />
+        <label for="effort" size="1">Effort to Implementation</label>
+        <select name="effort" id="effort" size="1" placeholder="1-5">
+            <option value="2">1</option>
+            <option value="1">2</option>
+            <option value="0">3</option>
+            <option value="-1">4</option>
+            <option value="-2">5</option>
+        </select>
+        <br />
+        <label for="ease" size="1">Ease of Use</label>
+        <select name="ease" id="ease" size="1" placeholder="1-5">
+            <option value="0">1</option>
+            <option value="1">2</option>
+            <option value="1.5">3</option>
+            <option value="2">4</option>
+            <option value="2.5">5</option>
+        </select>
+        <br />
+        <label for="scalability" size="1">Scalability</label>
+        <select name="scalability" id="scalability" size="1" placeholder="1-5">
+            <option value="-1">1</option>
+            <option value="0">2</option>
+            <option value="1">3</option>
+            <option value="2">4</option>
+            <option value="3">5</option>
+        </select>
+    </div>
+</fieldset>
+
+<!--
+    // NOTE:
+    // In an ideal world, authors could add multiple metrics and stories.
+    // id strings could be trimmed and incremented
+    <button id="addMetric">Add Metric</button>
+    <button id="addStory">Add Story</button>
+-->
+<button id="generateMatrix">Generate Matrix</button>
+
+<div id="priority_matrix">
+    <img src="assets/icon.png" alt="priority matrix" />
+</div>
+
+<script type="text/javascript">
+    var player = new VersalPlayerAPI();
+
+    player.on('editableChanged', function(editableObj){
+       if(editableObj.editable) {
+       document.body.appendChild(document.createTextNode('author '));
+     } else {
+       document.body.appendChild(document.createTextNode('learner '));
+     }
+    });
+
+    // send this command to receive initial events
+    player.startListening();
+
+    // continuously watch for changes in height
+    player.watchBodyHeight();
+
+    // save a textarea
+    var textarea = document.querySelector('textarea');
+    textarea.addEventListener('blur', function(){
+        player.setAttributes({
+          textareaValue: textarea.value
+        });
+    });
+
+    // change textarea when attributes change
+    player.on('attributesChanged', function(attrs){
+        if(attrs && attrs.textareaValue) {
+            textarea.value = attrs.textareaValue;
+        }
+    });
+
+    var editable = false;
+    player.on('editableChanged', function(editableObj){
+       editable = editableObj.editable;
+    });
+
+    // set an event listener
+    document.querySelector('img').addEventListener('click', function(){
+       if (editable) {
+         player.requestAsset({type: 'image'});
+       }
+    });
+
+    // persist image to server
+    player.on('assetSelected', function(assetData){
+     var imageUrl = player.assetUrl(assetData.asset.representations[0].id);
+     player.setAttributes({imageUrl: imageUrl});
+    });
+
+    player.on('attributesChanged', function(attrs){
+        //restore image src
+        if(attrs && attrs.imageUrl) {
+           document.querySelector('img').setAttribute('src', attrs.imageUrl);
+        }
+    });
+
+    var button1 = document.querySelector('#addStory');
+    button1.addEventListener('click', function() {
+       var createStory = document.querySelector('fieldset');
+       document.body.appendChild(document.createTextNode(createStory));
+    });
+
+   var button2 = document.querySelector('#generateMatrix');
+    button2.addEventListener('click', function() {
+       var imp = document.querySelector('#importance').value;
+       var rev = document.querySelector('#revenue').value;
+       var adv = document.querySelector('#advantage').value;
+       var eff = document.querySelector('#effort').value;
+       var eas = document.querySelector('#ease').value;
+       var scal = document.querySelector('#scalability').value;
+       var calculatePoint = function() {
+            // change multiplier to refine results
+            console.log((imp*1 + rev*1 + adv*1), (eff*1 + eas*1 + scal*1));
+       };
+       calculatePoint();
+    });
+
+
+</script>
+</body>
+
+</html>
